@@ -1,0 +1,85 @@
+class MyHashMap {
+
+    int size;
+    Node[] bucket;
+
+    public MyHashMap() {
+        size = 1000;
+        bucket = new Node[size];
+    }
+
+    public int hash(int key){
+        return key % size;
+    }
+    
+    public void put(int key, int value) {
+        int index = hash(key);
+        if(bucket[index]==null){
+            Node node = new Node(key, value);
+            bucket[index] = node;
+        }
+        else{
+            Node temp = bucket[index];
+            while(temp.next!=null){
+                if(temp.key == key){
+                    temp.val = value;
+                    return;
+                }
+                temp = temp.next;
+            }
+            if(temp.key == key) temp.val = value;
+            else{
+                Node node = new Node(key, value);
+                temp.next = node;
+            }
+        }
+    }
+    
+    public int get(int key) {
+        int index = hash(key);
+        Node temp = bucket[index];
+        while(temp!=null){
+            // System.out.print("["+temp.key+", "+temp.val+"]");
+            if(temp.key == key){
+                return temp.val;
+            }
+            temp = temp.next;
+        }
+        // System.out.println();
+        return -1;
+    }
+    
+    public void remove(int key) {
+        int index = hash(key);
+        Node temp = bucket[index];
+        if(temp==null) return;
+        if(temp!=null && temp.key == key){
+            bucket[index] = temp.next;
+            return;
+        }
+        while(temp.next!=null && temp.next.key!=key){
+            temp = temp.next;
+        }
+        if(temp.next!=null && temp.next.key==key){
+            temp.next = temp.next.next;
+        }
+    }
+}
+
+class Node{
+    int key;
+    int val;
+    Node next;
+    public Node(int k, int v){
+        key = k;
+        val = v;
+    }
+}
+
+/**
+ * Your MyHashMap object will be instantiated and called as such:
+ * MyHashMap obj = new MyHashMap();
+ * obj.put(key,value);
+ * int param_2 = obj.get(key);
+ * obj.remove(key);
+ */
