@@ -1,0 +1,94 @@
+class LFUCache {
+    int size;
+    Node head = new Node(-1, -1);
+    Node tail = new Node(-1, -1);
+    HashMap<Integer, Integer> m1;
+    HashMap<Integer, Node> m2;
+    public LFUCache(int capacity) {
+        size = capacity;
+        m1 = new HashMap<>();
+        m2 = new HashMap<>();
+        head.next = tail;
+        tail.prev = head;
+    }
+    
+    public int get(int key) {
+        int ans = -1;
+        if(m1.containsKey(key)){
+            ans = m2.get(key).value;
+            deletefrommid(key);
+            addNode(key, m1.get(key)+1, ans);
+            m1.put(key, m1.get(key)+1);
+        }
+        return ans;
+    }
+    
+    public void put(int key, int value) {
+        if(m1.containsKey(key)){
+            deletefrommid(key);
+            addNode(key, m1.get(key)+1, value);
+            m1.put(key, m1.get(key)+1);
+            m2.get(key).value = value;
+        }
+        else if(m1.size()==size){
+            deleteFromLast();
+            addNode(key, 1, value);
+            m1.put(key, 1);
+        }
+        else{
+            addNode(key, 1, value);
+            m1.put(key, 1);
+        }
+        // System.out.println(m1);
+    }
+
+    void deletefrommid(int key){
+        Node node = m2.get(key);
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+        m2.remove(key);
+    }
+
+    void deleteFromLast(){
+        Node nn = tail.prev;
+        nn.prev.next = tail;
+        tail.prev = nn.prev;
+        m1.remove(nn.key);
+        m2.remove(nn.key);
+    }
+
+    void addNode(int key, int freq, int value){
+        Node nn = head.next;
+        while(nn!=tail && m1.get(nn.key) > freq){
+            nn = nn.next;
+        }
+        Node newn = new Node(key, value);
+        Node temp = nn.prev;
+        temp.next = newn;
+        newn.prev = temp;
+        newn.next = nn;
+        nn.prev = newn;
+        // m1.add(key, value);
+        m2.put(key, newn);
+    }
+}
+
+class Node{
+    Node prev;
+    Node next;
+    int key;
+    int value;
+    public Node(int key, int value){
+        this.key = key;
+        this.value = value;
+        next = null;
+        prev = null;
+    }
+}
+
+/**
+ * Your LFUCache object will be instantiated and called as such:
+ * LFUCache obj = new LFUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
